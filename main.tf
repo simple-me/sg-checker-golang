@@ -18,7 +18,6 @@ resource "null_resource" "lambda_build" {
 
   provisioner "local-exec" {
     command = "cd aws-sdk-scan-security-groups && CGO_ENABLED=0 go build main.go"
-    #command = "cd aws-sdk-scan-security-groups && go build main.go"
   }
 
   triggers = {
