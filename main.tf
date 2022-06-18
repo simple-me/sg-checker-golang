@@ -1,5 +1,4 @@
 module "security_group_checker" {
-  //source                     = "../terraform_module_security_group_checker/"
   source                     = "git::https://github.com/non-existing-organization/terraform_module_security_group_checker.git?ref=master"
   source_file                = "aws-sdk-scan-security-groups/main"
   output_path                = "sg-checker.zip"
