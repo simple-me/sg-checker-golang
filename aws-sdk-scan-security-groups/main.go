@@ -22,6 +22,7 @@ import (
 )
 
 var list_sgs = []string{}
+var TABLE_NAME = os.Getenv("table_name")
 
 func sendSlackMessage(message string) {
 	OAUTH_TOKEN := os.Getenv("OAUTH_TOKEN")
@@ -55,34 +56,9 @@ func returnCreds(region string) aws.Config {
 	return cfg
 }
 
-func createTable() {
-	svc := dynamodb.NewFromConfig(returnCreds("us-east-1"))
-	out, err := svc.CreateTable(context.TODO(), &dynamodb.CreateTableInput{
-		AttributeDefinitions: []types.AttributeDefinition{
-			{
-				AttributeName: aws.String("id"),
-				AttributeType: types.ScalarAttributeTypeS,
-			},
-		},
-		KeySchema: []types.KeySchemaElement{
-			{
-				AttributeName: aws.String("id"),
-				KeyType:       types.KeyTypeHash,
-			},
-		},
-		TableName:   aws.String("my-table"),
-		BillingMode: types.BillingModePayPerRequest,
-	})
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(out)
-}
-
 func putDynamoItem(tableName string, securityGroup string, attributeName string) {
 	svc := dynamodb.NewFromConfig(returnCreds("us-east-1"))
-	list_items := scanDynamoTableItems("tf-notes-table")
+	list_items := scanDynamoTableItems(TABLE_NAME)
 
 	//Put Item if SG retrieved from API does not exist in the DynamoDB table
 	if !utils.IsElementExist(list_items, securityGroup) || len(list_items) == 0 {
@@ -106,7 +82,7 @@ func deleteUnnecessarySG(tableName string, attributeName string) {
 	//Delete Item if SG already in the table does not exist in the list recently retrieved from the DynamoDB
 	//API
 	svc := dynamodb.NewFromConfig(returnCreds("us-east-1"))
-	list_items := scanDynamoTableItems("tf-notes-table")
+	list_items := scanDynamoTableItems(TABLE_NAME)
 	for sg := range list_items {
 		if !utils.IsElementExist(list_sgs, list_items[sg]) {
 			fmt.Printf("sg %s from dynamodb table does no exist in list retrieved from the ec2 API", list_items[sg])
@@ -182,8 +158,6 @@ func LambdaHandler(event LambdaEvent) (LambdaResponse, error) {
 		for _, j := range i.IpPermissions {
 			if j.FromPort == nil {
 				fmt.Println("security group does not have from to port rule")
-			} else {
-				//fmt.Println(*j.FromPort)
 			}
 			for _, k := range j.IpRanges {
 				if *k.CidrIp == "0.0.0.0/0" {
@@ -196,10 +170,10 @@ func LambdaHandler(event LambdaEvent) (LambdaResponse, error) {
 		}
 	}
 	for sg := range list_sgs {
-		putDynamoItem("tf-notes-table", list_sgs[sg], "SecurityGroupId")
+		putDynamoItem(TABLE_NAME, list_sgs[sg], "SecurityGroupId")
 	}
 
-	deleteUnnecessarySG("tf-notes-table", "SecurityGroupId")
+	deleteUnnecessarySG(TABLE_NAME, "SecurityGroupId")
 	return LambdaResponse{
 		Message: fmt.Sprintf("%s is %d years old.", event.Name, event.Age),
 	}, nil
