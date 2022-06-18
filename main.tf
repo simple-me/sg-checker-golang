@@ -1,30 +1,36 @@
-provider "aws" {
-  region = "us-east-1"
+module "security_group_checker" {
+  //source                     = "../terraform_module_security_group_checker/"
+  source                     = "git::https://github.com/non-existing-organization/terraform_module_security_group_checker.git?ref=master"
+  source_file                = "aws-sdk-scan-security-groups/main"
+  output_path                = "sg-checker.zip"
+  function_name              = "security_group_checker_lambda"
+  table_name                 = "sg-checker-table"
+  attribute_name             = "SecurityGroupId"
+  schedule_expression        = "rate(1 minute)"
+  handler                    = "main"
+  dynamodb_policy_name       = "sg-checker-dynamodb-policy"
+  cloudwatch_event_rule_name = "trigger-sg-checker-lambda"
+  lambda_role_name           = "iam_for_lambda"
+  lambda_runtime                    = "go1.x"
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 }
 
 resource "null_resource" "lambda_build" {
 
   provisioner "local-exec" {
-    #command = "cd aws-sdk-scan-security-groups && CGO_ENABLED=0 go build main.go"
-    command = "cd aws-sdk-scan-security-groups && go build main.go"
+    command = "cd aws-sdk-scan-security-groups && CGO_ENABLED=0 go build main.go"
+    #command = "cd aws-sdk-scan-security-groups && go build main.go"
+  }
+
+  triggers = {
+    timestamp = timestamp()
   }
 
 }
 
-
 data "archive_file" "lambda_zip" {
-  depends_on = [null_resource.lambda_build]
+  depends_on  = [null_resource.lambda_build]
   type        = "zip"
   source_file = "aws-sdk-scan-security-groups/main"
-  output_path = "main.zip"
-}
-
-resource "aws_lambda_function" "sync_sgs" {
-  filename         = "main.zip"
-  function_name    = "security-group-sync"
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
-  role             = aws_iam_role.iam_for_lambda.arn
-  handler          = "main"
-  runtime          = "go1.x"
-  timeout = 10
+  output_path = "sg-checker.zip"
 }
