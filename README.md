@@ -24,12 +24,7 @@
   <p align="center">
     Golang script to monitor specific AWS Security group CIDR and store those in a DynamoDB table.
     <br />
-    <a href="https://github.com/not-existing-organization/terraform_module_security_group_checker/blob/master/README.md"><strong>Explore the docs »</strong></a>
     <br />
-    <br />
-    <a href="https://github.com/not-existing-organization/terraform_module_security_group_checker/issues/new?labels=i%3A+bug&template=1-bug-report.md">Report Bug</a>
-    ·
-    <a href="https://github.com/not-existing-organization/terraform_module_security_group_checker/issues/new?labels=i%3A+enhancement&template=2-feature-request.md">Request Feature</a>
   </p>
 </p>
 
