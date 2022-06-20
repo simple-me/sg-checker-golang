@@ -21,7 +21,6 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-var list_sgs = []string{}
 var TABLE_NAME = os.Getenv("table_name")
 
 func sendSlackMessage(message string) {
@@ -65,7 +64,6 @@ func putDynamoItem(tableName string, securityGroup string, attributeName string)
 		fmt.Printf("Sg does not exist, adding to table: %s", securityGroup)
 		result, err := svc.PutItem(context.TODO(), &dynamodb.PutItemInput{TableName: aws.String(tableName),
 			Item: map[string]types.AttributeValue{
-				//"noteId": &types.AttributeValueMemberS{Value: "aaaa"},
 				attributeName: &types.AttributeValueMemberS{Value: securityGroup},
 			},
 		})
@@ -78,7 +76,7 @@ func putDynamoItem(tableName string, securityGroup string, attributeName string)
 	}
 }
 
-func deleteUnnecessarySG(tableName string, attributeName string) {
+func deleteUnnecessarySG(tableName string, attributeName string, list_sgs []string) {
 	//Delete Item if SG already in the table does not exist in the list recently retrieved from the DynamoDB
 	//API
 	svc := dynamodb.NewFromConfig(returnCreds("us-east-1"))
@@ -145,6 +143,7 @@ type LambdaResponse struct {
 }
 
 func LambdaHandler(event LambdaEvent) (LambdaResponse, error) {
+	list_sgs := []string{}
 	svc := ec2.NewFromConfig(returnCreds("us-east-1"))
 
 	result, err := svc.DescribeSecurityGroups(context.TODO(), &ec2.DescribeSecurityGroupsInput{})
@@ -173,7 +172,7 @@ func LambdaHandler(event LambdaEvent) (LambdaResponse, error) {
 		putDynamoItem(TABLE_NAME, list_sgs[sg], "SecurityGroupId")
 	}
 
-	deleteUnnecessarySG(TABLE_NAME, "SecurityGroupId")
+	deleteUnnecessarySG(TABLE_NAME, "SecurityGroupId", list_sgs)
 	return LambdaResponse{
 		Message: fmt.Sprintf("%s is %d years old.", event.Name, event.Age),
 	}, nil
