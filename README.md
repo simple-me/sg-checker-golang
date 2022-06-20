@@ -24,12 +24,7 @@
   <p align="center">
     Golang script to monitor specific AWS Security group CIDR and store those in a DynamoDB table.
     <br />
-    <a href="https://github.com/not-existing-organization/terraform_module_security_group_checker/blob/master/README.md"><strong>Explore the docs »</strong></a>
     <br />
-    <br />
-    <a href="https://github.com/not-existing-organization/terraform_module_security_group_checker/issues/new?labels=i%3A+bug&template=1-bug-report.md">Report Bug</a>
-    ·
-    <a href="https://github.com/not-existing-organization/terraform_module_security_group_checker/issues/new?labels=i%3A+enhancement&template=2-feature-request.md">Request Feature</a>
   </p>
 </p>
 
@@ -107,7 +102,7 @@ There's a locals block in the *main.tf* file to modify a couple of fields that a
 
 ## Roadmap
 
-See the [open issues](https://github.com/not-existing-organization/terraform_module_security_group_checker/raw/main/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/simple-me/sg-checker-golang/issues) for a list of proposed features (and known issues).
 
 ---
 
@@ -138,15 +133,6 @@ Distributed under the GPL-3.0 License. See `LICENSE` for more information.
 Santiago - elfmg1@gmail.com
 
 ---
-
-<!-- ACKNOWLEDGEMENTS -->
-
-## Acknowledgements
-
-- [GitHub Emoji Cheat Sheet](https://www.webpagefx.com/tools/emoji-cheat-sheet)
-- [Img Shields](https://shields.io)
-- [Choose an Open Source License](https://choosealicense.com)
-- [GitHub Pages](https://pages.github.com)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
