@@ -102,7 +102,7 @@ There's a locals block in the *main.tf* file to modify a couple of fields that a
 
 ## Roadmap
 
-See the [open issues](https://github.com/not-existing-organization/terraform_module_security_group_checker/raw/main/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/simple-me/sg-checker-golang/issues) for a list of proposed features (and known issues).
 
 ---
 
