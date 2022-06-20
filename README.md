@@ -49,7 +49,7 @@
 
 ## About The Project
 
-At the moment there's only one hardcoded criteria, which is "0.0.0.0/0". The idea is to convert it into something more flexible to accept other kinds of inputs. The terraform module that this project consumes was also written by me to easily deploy a AWS lambda and a DynamoDB table with all the required permissions for the former to access the latter.
+The CIDRs the user wish to keep monitored can be added to the "config.yaml" (this one already exists as an example), this file will be consumed and processed via Viper. The terraform module that this project consumes was also written by me to easily deploy an AWS lambda and a DynamoDB table with all the required permissions for the former to access the latter.
 
 
 ### Built With
