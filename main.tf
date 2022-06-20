@@ -29,6 +29,6 @@ resource "null_resource" "lambda_build" {
 data "archive_file" "lambda_zip" {
   depends_on  = [null_resource.lambda_build]
   type        = "zip"
-  source_file = "aws-sdk-scan-security-groups/main"
+  source_dir = "aws-sdk-scan-security-groups/"
   output_path = "sg-checker.zip"
 }

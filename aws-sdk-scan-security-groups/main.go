@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"describe_security_groups/utils"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -13,12 +14,10 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-
-	"github.com/slack-go/slack"
-
-	"describe_security_groups/utils"
+	"github.com/spf13/viper"
 
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/slack-go/slack"
 )
 
 var TABLE_NAME = os.Getenv("table_name")
@@ -158,12 +157,25 @@ func LambdaHandler(event LambdaEvent) (LambdaResponse, error) {
 			if j.FromPort == nil {
 				fmt.Println("security group does not have from to port rule")
 			}
-			for _, k := range j.IpRanges {
-				if *k.CidrIp == "0.0.0.0/0" {
-					if !utils.IsElementExist(list_sgs, *i.GroupId) {
-						list_sgs = append(list_sgs, *i.GroupId)
-					}
 
+			for _, k := range j.IpRanges {
+
+				viper.SetConfigName("config") // name of config file (without extension)
+				viper.AddConfigPath(".")      // path to look for the config file in
+
+				err = viper.ReadInConfig()
+				if err != nil {
+					fmt.Println("Config not found...")
+				} else {
+					fmt.Println("config found....")
+					cidrs := viper.GetStringSlice("CIDR")
+					fmt.Println(cidrs)
+					if utils.IsElementExist(cidrs, *k.CidrIp) {
+						if !utils.IsElementExist(list_sgs, *i.GroupId) {
+							list_sgs = append(list_sgs, *i.GroupId)
+						}
+
+					}
 				}
 			}
 		}
@@ -176,6 +188,7 @@ func LambdaHandler(event LambdaEvent) (LambdaResponse, error) {
 	return LambdaResponse{
 		Message: fmt.Sprintf("%s is %d years old.", event.Name, event.Age),
 	}, nil
+
 }
 
 func main() {
