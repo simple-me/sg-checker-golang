@@ -21,7 +21,6 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-//var list_sgs = []string{}
 var TABLE_NAME = os.Getenv("table_name")
 
 func sendSlackMessage(message string) {
@@ -65,7 +64,6 @@ func putDynamoItem(tableName string, securityGroup string, attributeName string)
 		fmt.Printf("Sg does not exist, adding to table: %s", securityGroup)
 		result, err := svc.PutItem(context.TODO(), &dynamodb.PutItemInput{TableName: aws.String(tableName),
 			Item: map[string]types.AttributeValue{
-				//"noteId": &types.AttributeValueMemberS{Value: "aaaa"},
 				attributeName: &types.AttributeValueMemberS{Value: securityGroup},
 			},
 		})
@@ -173,8 +171,6 @@ func LambdaHandler(event LambdaEvent) (LambdaResponse, error) {
 	for sg := range list_sgs {
 		putDynamoItem(TABLE_NAME, list_sgs[sg], "SecurityGroupId")
 	}
-
-	fmt.Println("sgs from ec2 api", list_sgs)
 
 	deleteUnnecessarySG(TABLE_NAME, "SecurityGroupId", list_sgs)
 	return LambdaResponse{
