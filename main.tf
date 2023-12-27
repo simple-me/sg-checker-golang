@@ -1,6 +1,5 @@
 module "security_group_checker" {
-  source                     = "git::https://github.com/non-existing-organization/terraform_module_security_group_checker.git?ref=master"
-  source_file                = "aws-sdk-scan-security-groups/main"
+  source                     = "git::https://github.com/non-existing-organization/terraform_module_lambda_dynamodb.git?ref=0.1.0"
   output_path                = "sg-checker.zip"
   function_name              = "security_group_checker_lambda"
   table_name                 = "sg-checker-table"
@@ -12,6 +11,7 @@ module "security_group_checker" {
   lambda_role_name           = "iam_for_lambda"
   lambda_runtime                    = "go1.x"
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  cw_event_is_enabled = var.cw_event_is_enabled
 }
 
 resource "null_resource" "lambda_build" {
